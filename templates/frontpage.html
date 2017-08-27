@@ -1,2 +1,10 @@
-<h1>Hello</h1>
-rgergsegerg
+<div ng-init="init()">
+    <div class="tile" ng-repeat="article in articles track by $index">
+      <div class="tile is-parent is-vertical">
+        <article class="tile is-child notification">
+          <p class="title">{{ article.title.rendered }}</p>
+          <p class="subtitle" ng-bind-html="article.excerpt.rendered"></p>
+        </article>
+      </div>
+    </div>
+</div>

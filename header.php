@@ -1,6 +1,10 @@
-<?php $sitename = get_bloginfo('name'); ?>
+<?php 
+$sitename = get_bloginfo('name'); 
+$sitedescription = get_bloginfo('description'); 
+?>
 <!doctype html>
 <head>
+<base href="/">
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title><?php echo !empty($sitename) ? $sitename : 'A Basic Angular.js based WP Theme'; ?></title>
@@ -16,8 +20,12 @@
 <script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/angular/angular-route.min.js"></script>
 <script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/angular/angular-sanitize.min.js"></script>
 <script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/app.js"></script>
+<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/app-services.js"></script>
+<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/app-directives.js"></script>
+<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/app-routes.js"></script>
+<script type="text/javascript" src="<?php echo get_template_directory_uri(); ?>/js/app-controllers.js"></script>
 </head>
-<body ng-app="basicAngularThemeApp">
+<body ng-app="basicAngularThemeApp" ng-controller="siteCtrl">
 	<section class="hero is-info is-medium">
 	  <!-- Hero header: will stick at the top -->
 	  <div class="hero-head">
@@ -25,7 +33,15 @@
 	      <div class="container">
 	        <div class="nav-left">
 	          <a class="nav-item">
-	            <img src="images/bulma-type-white.png" alt="Logo">
+	          	<?php
+				$custom_logo_id = get_theme_mod( 'custom_logo' );
+				$logo = wp_get_attachment_image_src( $custom_logo_id , 'full' );
+				if ( has_custom_logo() ) {
+				        echo '<img src="'. esc_url( $logo[0] ) .'">';
+				} else {
+				        echo '<h1>'. $sitename .'</h1>';
+				}
+	          	?>
 	          </a>
 	        </div>
 	        <span class="nav-toggle">
@@ -33,24 +49,8 @@
 	          <span></span>
 	          <span></span>
 	        </span>
-	        <div class="nav-right nav-menu">
-	          <a class="nav-item is-active">
-	            Home
-	          </a>
-	          <a class="nav-item">
-	            Examples
-	          </a>
-	          <a class="nav-item">
-	            Documentation
-	          </a>
-	          <span class="nav-item">
-	            <a class="button is-info is-inverted">
-	              <span class="icon">
-	                <i class="fa fa-github"></i>
-	              </span>
-	              <span>Download</span>
-	            </a>
-	          </span>
+	        <div class="nav-right nav-menu" ng-init="getTopMenu()">
+	          <a ng-repeat="item in menus.top" class="nav-item" href="{{ item.url }}">{{ item.title }}</a>
 	        </div>
 	      </div>
 	    </header>
@@ -60,10 +60,10 @@
 	  <div class="hero-body">
 	    <div class="container has-text-centered">
 	      <h1 class="title">
-	        Title
+	        <?php echo $sitename; ?>
 	      </h1>
 	      <h2 class="subtitle">
-	        Subtitle
+	        <?php echo $sitedescription; ?>
 	      </h2>
 	    </div>
 	  </div>
@@ -72,13 +72,10 @@
 	  <div class="hero-foot">
 	    <nav class="tabs is-boxed is-fullwidth">
 	      <div class="container">
-	        <ul>
-	          <li class="is-active"><a>Overview</a></li>
-	          <li><a>Modifiers</a></li>
-	          <li><a>Grid</a></li>
-	          <li><a>Elements</a></li>
-	          <li><a>Components</a></li>
-	          <li><a>Layout</a></li>
+	        <ul ng-init="getMainMenu()">
+	        	<li ng-repeat="item in menus.main">
+	        		<a href="{{ item.url }}">{{ item.title }}</a>
+	        	</li>
 	        </ul>
 	      </div>
 	    </nav>
@@ -89,10 +86,10 @@
 	  <div class="hero-body">
 	    <div class="container">
 	      <h1 class="title">
-	        Primary title
+	        {{ current.primaryTitle }}
 	      </h1>
 	      <h2 class="subtitle">
-	        Primary subtitle
+	        {{ current.primarySubTitle }}
 	      </h2>
 	    </div>
 	  </div>
@@ -101,12 +98,12 @@
 	<section class="hero">
 	  <div class="hero-body">
 	    <div class="container">
-				<div class="columns">
-				  <div class="column">
-				  	<div ng-view></div>
-				  </div>
-				  <div class="column is-one-quarter">is-one-quarter</div>
-				</div>
+		<div class="columns">
+		  <div class="column">
+		  	<div ng-view></div>
+		  </div>
+		  <div class="column is-one-quarter">is-one-quarter</div>
+		</div>
 	    </div>
 	  </div>
 	</section>
